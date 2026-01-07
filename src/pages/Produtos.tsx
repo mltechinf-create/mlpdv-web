@@ -65,17 +65,25 @@ export default function Produtos() {
 
   const loadProdutos = async (cnpj: string) => {
     setLoading(true)
+    console.log('[PRODUTOS] Buscando para CNPJ:', cnpj)
+    
+    // Primeiro buscar todos para debug
+    const { data: allData } = await supabase
+      .from('produtos')
+      .select('cnpj, nome')
+      .limit(10)
+    console.log('[PRODUTOS] Amostra de todos:', allData)
+    
     const { data, error } = await supabase
       .from('produtos')
       .select('*')
       .eq('cnpj', cnpj)
-      .or('ativo.eq.true,ativo.is.null')
       .order('nome')
 
     if (error) {
-      console.error('Erro ao carregar produtos:', error)
+      console.error('[PRODUTOS] Erro:', error)
     }
-    console.log('Produtos carregados:', data?.length || 0)
+    console.log('[PRODUTOS] Encontrados:', data?.length || 0)
     setProdutos(data || [])
     setLoading(false)
   }
