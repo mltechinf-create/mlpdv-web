@@ -200,7 +200,7 @@ export default function Dashboard() {
         </div>
 
         {/* Cards de estatísticas */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
           <Link 
             to={`/${cnpjParam}/produtos`} 
             className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
@@ -246,7 +246,7 @@ export default function Dashboard() {
 
         {/* Menu de navegação */}
         <h3 className="text-sm font-semibold text-gray-600 mb-3">Acesso Rápido</h3>
-        <div className="grid grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <Link 
             to={`/${cnpjParam}/produtos`} 
             className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-2"
