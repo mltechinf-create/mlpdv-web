@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { ArrowLeft, Plus, Search, Edit, Trash2, Package, X, Save, RefreshCw } from 'lucide-react'
@@ -31,7 +31,7 @@ export default function Produtos() {
 
   useEffect(() => {
     const sessionData = localStorage.getItem('mlpdv_session')
-    if (!sessionData) { navigate(/+cnpjParam); return }
+    if (!sessionData) { navigate('/' + cnpjParam); return }
     loadProdutos(cnpjParam?.replace(/\D/g, '') || '')
   }, [navigate, cnpjParam])
 
