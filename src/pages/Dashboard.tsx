@@ -103,7 +103,7 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     localStorage.removeItem('mlpdv_session')
-    navigate(`/${cnpjParam}`)
+    window.location.href = 'https://painel.mlpdv.com.br/'
   }
 
   const formatCNPJ = (cnpj: string) => {

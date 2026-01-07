@@ -11,12 +11,32 @@ export default function Login() {
   const [senha, setSenha] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [manterConectado, setManterConectado] = useState(false)
 
   useEffect(() => {
     if (cnpjParam) {
-      loadEmpresa(cnpjParam.replace(/\D/g, ''))
+      const cnpjDigits = cnpjParam.replace(/\D/g, '')
+      loadEmpresa(cnpjDigits)
+      
+      // Verificar se tem credenciais salvas para este CNPJ
+      const savedCreds = localStorage.getItem('mlpdv_saved_login_' + cnpjDigits)
+      if (savedCreds) {
+        const { cpf: savedCpf, senha: savedSenha } = JSON.parse(savedCreds)
+        setCpf(savedCpf)
+        setSenha(savedSenha)
+        setManterConectado(true)
+      }
+      
+      // Verificar se já tem sessão válida
+      const session = localStorage.getItem('mlpdv_session')
+      if (session) {
+        const parsed = JSON.parse(session)
+        if (parsed.cnpj === cnpjDigits) {
+          navigate('/' + cnpjParam + '/dashboard')
+        }
+      }
     }
-  }, [cnpjParam])
+  }, [cnpjParam, navigate])
 
   const loadEmpresa = async (cnpj: string) => {
     const { data } = await supabase
@@ -76,7 +96,14 @@ export default function Login() {
         loggedAt: new Date().toISOString()
       }))
 
-      navigate(`/${cnpjParam}/dashboard`)
+      // Salvar credenciais se "Manter conectado" estiver marcado
+      if (manterConectado) {
+        localStorage.setItem('mlpdv_saved_login_' + cnpjDigits, JSON.stringify({ cpf, senha }))
+      } else {
+        localStorage.removeItem('mlpdv_saved_login_' + cnpjDigits)
+      }
+
+      navigate('/' + cnpjParam + '/dashboard')
     } catch (err: any) {
       setError(err.message || 'Erro ao fazer login')
     } finally {
@@ -125,6 +152,16 @@ export default function Login() {
               />
             </div>
           </div>
+
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={manterConectado}
+              onChange={(e) => setManterConectado(e.target.checked)}
+              className="w-4 h-4 text-[#006669] border-gray-300 rounded focus:ring-[#00A5AB]"
+            />
+            <span className="text-sm text-gray-600">Manter conectado</span>
+          </label>
 
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
