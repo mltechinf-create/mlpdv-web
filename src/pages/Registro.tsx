@@ -8,6 +8,8 @@ export default function Registro() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [cnpjExists, setCnpjExists] = useState(false)
+  const [checkingCnpj, setCheckingCnpj] = useState(false)
   
   const [empresa, setEmpresa] = useState({
     cnpj: '',
@@ -41,6 +43,42 @@ export default function Registro() {
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d)/, '$1.$2')
       .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+  }
+
+  const checkCnpjExists = async (cnpj: string) => {
+    const digits = cnpj.replace(/\D/g, '')
+    if (digits.length !== 14) {
+      setCnpjExists(false)
+      return
+    }
+    
+    setCheckingCnpj(true)
+    try {
+      const { data } = await supabase
+        .from('empresas')
+        .select('cnpj, nome_fantasia, razao_social')
+        .eq('cnpj', digits)
+        .single()
+      
+      if (data) {
+        setCnpjExists(true)
+        setError(`Este CNPJ já está cadastrado (${data.nome_fantasia || data.razao_social}). Acesse diretamente a página de login.`)
+      } else {
+        setCnpjExists(false)
+        setError('')
+      }
+    } catch {
+      setCnpjExists(false)
+      setError('')
+    } finally {
+      setCheckingCnpj(false)
+    }
+  }
+
+  const handleCnpjChange = (value: string) => {
+    const formatted = formatCNPJ(value)
+    setEmpresa({ ...empresa, cnpj: formatted })
+    checkCnpjExists(formatted)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,7 +173,7 @@ export default function Registro() {
           </div>
         </div>
 
-        <form onSubmit={step === 2 ? handleSubmit : (e) => { e.preventDefault(); setStep(2) }}>
+        <form onSubmit={step === 2 ? handleSubmit : (e) => { e.preventDefault(); if (!cnpjExists) setStep(2) }}>
           {step === 1 && (
             <div className="space-y-4">
               <div>
@@ -145,12 +183,29 @@ export default function Registro() {
                   <input
                     type="text"
                     value={empresa.cnpj}
-                    onChange={(e) => setEmpresa({ ...empresa, cnpj: formatCNPJ(e.target.value) })}
+                    onChange={(e) => handleCnpjChange(e.target.value)}
                     placeholder="00.000.000/0000-00"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none ${cnpjExists ? 'border-amber-500 bg-amber-50' : 'border-gray-300'}`}
                     required
                   />
+                  {checkingCnpj && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="w-5 h-5 border-2 border-[#006669] border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
                 </div>
+                {cnpjExists && (
+                  <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-800 mb-2">Este CNPJ já está cadastrado!</p>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/${empresa.cnpj.replace(/\D/g, '')}`)}
+                      className="text-sm font-medium text-[#006669] hover:underline"
+                    >
+                      Ir para página de login →
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>
