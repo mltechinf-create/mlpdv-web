@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { ArrowLeft, Plus, Search, Edit, Trash2, Package, X, Save } from 'lucide-react'
+import { ArrowLeft, Plus, Search, Edit, Trash2, Package, X, Save, RefreshCw, Menu } from 'lucide-react'
 
 interface Produto {
   id: string
-  codigo: string | null
+  codigo_interno: string | null
   nome: string
   categoria: string | null
   preco_venda: number
-  estoque_atual: number
-  unidade: string
+  estoque: number
+  unidade_venda: string
+  ean_gtin: string | null
 }
 
 export default function Produtos() {
@@ -24,12 +25,13 @@ export default function Produtos() {
   const [saving, setSaving] = useState(false)
 
   const [form, setForm] = useState({
-    codigo: '',
+    codigo_interno: '',
     nome: '',
     categoria: '',
     preco_venda: '',
-    estoque_atual: '',
-    unidade: 'UN'
+    estoque: '',
+    unidade_venda: 'UN',
+    ean_gtin: ''
   })
 
   useEffect(() => {
@@ -58,16 +60,17 @@ export default function Produtos() {
     if (produto) {
       setEditingProduto(produto)
       setForm({
-        codigo: produto.codigo || '',
+        codigo_interno: produto.codigo_interno || '',
         nome: produto.nome,
         categoria: produto.categoria || '',
         preco_venda: String(produto.preco_venda),
-        estoque_atual: String(produto.estoque_atual),
-        unidade: produto.unidade
+        estoque: String(produto.estoque),
+        unidade_venda: produto.unidade_venda || 'UN',
+        ean_gtin: produto.ean_gtin || ''
       })
     } else {
       setEditingProduto(null)
-      setForm({ codigo: '', nome: '', categoria: '', preco_venda: '', estoque_atual: '0', unidade: 'UN' })
+      setForm({ codigo_interno: '', nome: '', categoria: '', preco_venda: '', estoque: '0', unidade_venda: 'UN', ean_gtin: '' })
     }
     setShowModal(true)
   }
@@ -82,12 +85,13 @@ export default function Produtos() {
         await supabase
           .from('produtos')
           .update({
-            codigo: form.codigo || null,
+            codigo_interno: form.codigo_interno || null,
             nome: form.nome.toUpperCase(),
             categoria: form.categoria?.toUpperCase() || null,
             preco_venda: parseFloat(form.preco_venda) || 0,
-            estoque_atual: parseFloat(form.estoque_atual) || 0,
-            unidade: form.unidade,
+            estoque: parseFloat(form.estoque) || 0,
+            unidade_venda: form.unidade_venda,
+            ean_gtin: form.ean_gtin || null,
             updated_at: new Date().toISOString()
           })
           .eq('id', editingProduto.id)
@@ -97,12 +101,13 @@ export default function Produtos() {
           .insert({
             cnpj,
             local_id: `web_${Date.now()}`,
-            codigo: form.codigo || null,
+            codigo_interno: form.codigo_interno || null,
             nome: form.nome.toUpperCase(),
             categoria: form.categoria?.toUpperCase() || null,
             preco_venda: parseFloat(form.preco_venda) || 0,
-            estoque_atual: parseFloat(form.estoque_atual) || 0,
-            unidade: form.unidade,
+            estoque: parseFloat(form.estoque) || 0,
+            unidade_venda: form.unidade_venda,
+            ean_gtin: form.ean_gtin || null,
             origem: 'web'
           })
       }
@@ -129,7 +134,8 @@ export default function Produtos() {
 
   const filtered = produtos.filter(p =>
     p.nome.toLowerCase().includes(search.toLowerCase()) ||
-    p.codigo?.toLowerCase().includes(search.toLowerCase())
+    p.codigo_interno?.toLowerCase().includes(search.toLowerCase()) ||
+    p.ean_gtin?.toLowerCase().includes(search.toLowerCase())
   )
 
   return (
@@ -190,14 +196,14 @@ export default function Produtos() {
               <tbody>
                 {filtered.map((produto) => (
                   <tr key={produto.id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-600">{produto.codigo || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{produto.codigo_interno || '-'}</td>
                     <td className="px-4 py-3 font-medium text-gray-800">{produto.nome}</td>
                     <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">{produto.categoria || '-'}</td>
                     <td className="px-4 py-3 text-right font-medium text-green-600">
                       R$ {produto.preco_venda.toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-right text-sm text-gray-600 hidden sm:table-cell">
-                      {produto.estoque_atual} {produto.unidade}
+                      {produto.estoque} {produto.unidade_venda}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
@@ -232,12 +238,12 @@ export default function Produtos() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
-                  <input type="text" value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })}
+                  <input type="text" value={form.codigo_interno} onChange={(e) => setForm({ ...form, codigo_interno: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
-                  <select value={form.unidade} onChange={(e) => setForm({ ...form, unidade: e.target.value })}
+                  <select value={form.unidade_venda} onChange={(e) => setForm({ ...form, unidade_venda: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none">
                     <option value="UN">UN</option>
                     <option value="KG">KG</option>
@@ -268,7 +274,7 @@ export default function Produtos() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Estoque</label>
-                  <input type="number" step="0.001" value={form.estoque_atual} onChange={(e) => setForm({ ...form, estoque_atual: e.target.value })}
+                  <input type="number" step="0.001" value={form.estoque} onChange={(e) => setForm({ ...form, estoque: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
                 </div>
               </div>
