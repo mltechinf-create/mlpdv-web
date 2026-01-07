@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Package, Users, ShoppingCart, LogOut, BarChart3, Settings, Menu, X, RefreshCw } from 'lucide-react'
+import { Package, Users, ShoppingCart, LogOut, BarChart3, Settings, Menu, X, RefreshCw, Check } from 'lucide-react'
 
 interface Empresa {
   nome_fantasia: string | null
   razao_social: string
+  updated_at?: string
 }
 
 interface Session {
@@ -23,6 +24,8 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ produtos: 0, clientes: 0, vendas: 0 })
   const [menuOpen, setMenuOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [lastSync, setLastSync] = useState<Date | null>(null)
+  const [syncing, setSyncing] = useState(false)
 
   useEffect(() => {
     const sessionData = localStorage.getItem('mlpdv_session')
@@ -40,11 +43,16 @@ export default function Dashboard() {
     setLoading(true)
     const { data: empresaData } = await supabase
       .from('empresas')
-      .select('nome_fantasia, razao_social')
+      .select('nome_fantasia, razao_social, updated_at')
       .eq('cnpj', cnpj)
       .single()
 
-    if (empresaData) setEmpresa(empresaData)
+    if (empresaData) {
+      setEmpresa(empresaData)
+      if (empresaData.updated_at) {
+        setLastSync(new Date(empresaData.updated_at))
+      }
+    }
 
     const [produtosRes, clientesRes, vendasRes] = await Promise.all([
       supabase.from('produtos').select('id', { count: 'exact', head: true }).eq('cnpj', cnpj),
@@ -58,6 +66,37 @@ export default function Dashboard() {
       vendas: vendasRes.count || 0
     })
     setLoading(false)
+  }
+
+  const handleSync = async () => {
+    if (syncing) return
+    setSyncing(true)
+    const cnpj = cnpjParam?.replace(/\D/g, '') || session?.cnpj || ''
+    
+    try {
+      // Atualiza timestamp da empresa
+      await supabase
+        .from('empresas')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('cnpj', cnpj)
+      
+      setLastSync(new Date())
+      // Recarrega os dados
+      await loadData(cnpj)
+    } catch (err) {
+      console.error('Erro ao sincronizar:', err)
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  const formatSyncDate = (date: Date) => {
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear().toString().slice(-2)
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
+    return `${day}/${month}/${year} às ${hours}:${minutes}`
   }
 
   const handleLogout = () => {
@@ -237,11 +276,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Info discreta */}
-        <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
-          <RefreshCw className="w-3 h-3" />
-          <span>Sincronizado com ML PDV Desktop</span>
-        </div>
+        {/* Badge de sincronização */}
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#006669] hover:bg-[#006669]/5 px-3 py-1.5 rounded-full border border-gray-200 hover:border-[#006669]/30 transition-all cursor-pointer disabled:opacity-50 mb-4"
+        >
+          {syncing ? (
+            <RefreshCw className="w-3 h-3 animate-spin" />
+          ) : (
+            <Check className="w-3 h-3 text-green-500" />
+          )}
+          <span>
+            {syncing ? 'Sincronizando...' : lastSync ? `Sincronizado em ${formatSyncDate(lastSync)}` : 'Sincronizar'}
+          </span>
+        </button>
 
         {/* Footer */}
         <footer className="mt-4 pt-4 border-t border-gray-200 text-center">
