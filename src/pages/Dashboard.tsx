@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { Building2, Package, Users, ShoppingCart, LogOut, BarChart3, Settings } from 'lucide-react'
+import { Package, Users, ShoppingCart, LogOut, BarChart3, Settings, Menu, X, RefreshCw } from 'lucide-react'
 
 interface Empresa {
   nome_fantasia: string | null
@@ -21,6 +21,8 @@ export default function Dashboard() {
   const [session, setSession] = useState<Session | null>(null)
   const [empresa, setEmpresa] = useState<Empresa | null>(null)
   const [stats, setStats] = useState({ produtos: 0, clientes: 0, vendas: 0 })
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const sessionData = localStorage.getItem('mlpdv_session')
@@ -35,6 +37,7 @@ export default function Dashboard() {
   }, [navigate, cnpjParam])
 
   const loadData = async (cnpj: string) => {
+    setLoading(true)
     const { data: empresaData } = await supabase
       .from('empresas')
       .select('nome_fantasia, razao_social')
@@ -54,6 +57,7 @@ export default function Dashboard() {
       clientes: clientesRes.count || 0,
       vendas: vendasRes.count || 0
     })
+    setLoading(false)
   }
 
   const handleLogout = () => {
@@ -61,102 +65,209 @@ export default function Dashboard() {
     navigate(`/${cnpjParam}`)
   }
 
+  const formatCNPJ = (cnpj: string) => {
+    return cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+  }
+
   if (!session) return null
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Building2 className="w-6 h-6 text-blue-600" />
-            <div>
-              <h1 className="font-semibold text-gray-800">
-                {empresa?.nome_fantasia || empresa?.razao_social || 'Carregando...'}
-              </h1>
-              <p className="text-xs text-gray-500">
-                CNPJ: {session.cnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')}
-              </p>
+    <div className="min-h-screen bg-[#f8fafb]">
+      {/* Header ML Tech */}
+      <header className="bg-gradient-to-r from-[#006669] to-[#00A5AB] text-white sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center font-bold text-lg">
+                  ML
+                </div>
+                <div className="hidden sm:block">
+                  <h1 className="font-bold text-lg leading-tight">ML PDV</h1>
+                  <p className="text-xs text-white/70">Painel Administrativo</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 hidden sm:block">
-              Olá, <strong>{session.nome}</strong>
-            </span>
-            <button onClick={handleLogout} className="p-2 hover:bg-gray-100 rounded-lg text-gray-600" title="Sair">
-              <LogOut className="w-5 h-5" />
+
+            <div className="hidden md:flex items-center gap-6">
+              <div className="text-right">
+                <p className="font-medium text-sm">{empresa?.nome_fantasia || empresa?.razao_social}</p>
+                <p className="text-xs text-white/70">CNPJ: {formatCNPJ(session.cnpj)}</p>
+              </div>
+              <div className="h-8 w-px bg-white/20" />
+              <div className="flex items-center gap-3">
+                <div className="text-right">
+                  <p className="text-sm font-medium">{session.nome}</p>
+                  <p className="text-xs text-white/70 capitalize">{session.perfil}</p>
+                </div>
+                <button 
+                  onClick={handleLogout} 
+                  className="p-2 hover:bg-white/10 rounded-lg transition"
+                  title="Sair"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <button 
+              className="md:hidden p-2 hover:bg-white/10 rounded-lg"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="md:hidden border-t border-white/10 px-4 py-3 space-y-2">
+            <div className="py-2">
+              <p className="font-medium">{empresa?.nome_fantasia || empresa?.razao_social}</p>
+              <p className="text-xs text-white/70">CNPJ: {formatCNPJ(session.cnpj)}</p>
+            </div>
+            <div className="py-2 border-t border-white/10">
+              <p className="text-sm">{session.nome}</p>
+              <p className="text-xs text-white/70 capitalize">{session.perfil}</p>
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="w-full py-2 text-left text-sm flex items-center gap-2 text-white/80 hover:text-white"
+            >
+              <LogOut className="w-4 h-4" />
+              Sair
+            </button>
+          </div>
+        )}
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <Link to={`/${cnpjParam}/produtos`} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-[#00A5AB]/20 rounded-lg">
-                <Package className="w-6 h-6 text-[#006669]" />
-              </div>
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Boas-vindas */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Olá, {session.nome.split(' ')[0]}! 👋
+            </h2>
+            <p className="text-gray-500">Aqui está o resumo do seu negócio</p>
+          </div>
+          <button 
+            onClick={() => loadData(cnpjParam?.replace(/\D/g, '') || session.cnpj)}
+            disabled={loading}
+            className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition"
+            title="Atualizar"
+          >
+            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+
+        {/* Cards de estatísticas */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <Link 
+            to={`/${cnpjParam}/produtos`} 
+            className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100"
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-gray-800">{stats.produtos}</p>
-                <p className="text-sm text-gray-500">Produtos</p>
+                <p className="text-3xl font-bold text-gray-800">{stats.produtos}</p>
+                <p className="text-gray-500 mt-1">Produtos</p>
+              </div>
+              <div className="p-4 bg-gradient-to-br from-[#006669] to-[#00A5AB] rounded-xl">
+                <Package className="w-6 h-6 text-white" />
               </div>
             </div>
           </Link>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Users className="w-6 h-6 text-green-600" />
-              </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-gray-800">{stats.clientes}</p>
-                <p className="text-sm text-gray-500">Clientes</p>
+                <p className="text-3xl font-bold text-gray-800">{stats.clientes}</p>
+                <p className="text-gray-500 mt-1">Clientes</p>
+              </div>
+              <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl">
+                <Users className="w-6 h-6 text-white" />
               </div>
             </div>
+            <p className="text-xs text-gray-400 mt-3">Em breve</p>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <ShoppingCart className="w-6 h-6 text-purple-600" />
-              </div>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold text-gray-800">{stats.vendas}</p>
-                <p className="text-sm text-gray-500">Vendas</p>
+                <p className="text-3xl font-bold text-gray-800">{stats.vendas}</p>
+                <p className="text-gray-500 mt-1">Vendas</p>
+              </div>
+              <div className="p-4 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl">
+                <ShoppingCart className="w-6 h-6 text-white" />
               </div>
             </div>
+            <p className="text-xs text-gray-400 mt-3">Em breve</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Link to={`/${cnpjParam}/produtos`} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col items-center gap-3">
-            <Package className="w-10 h-10 text-[#006669]" />
+        {/* Menu de navegação */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Acesso Rápido</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          <Link 
+            to={`/${cnpjParam}/produtos`} 
+            className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100 flex flex-col items-center gap-3"
+          >
+            <div className="p-3 bg-[#006669]/10 rounded-xl">
+              <Package className="w-8 h-8 text-[#006669]" />
+            </div>
             <span className="font-medium text-gray-700">Produtos</span>
           </Link>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm flex flex-col items-center gap-3 opacity-50">
-            <Users className="w-10 h-10 text-green-600" />
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
+            <div className="p-3 bg-emerald-50 rounded-xl">
+              <Users className="w-8 h-8 text-emerald-600" />
+            </div>
             <span className="font-medium text-gray-700">Clientes</span>
+            <span className="text-xs text-gray-400">Em breve</span>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm flex flex-col items-center gap-3 opacity-50">
-            <BarChart3 className="w-10 h-10 text-purple-600" />
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
+            <div className="p-3 bg-violet-50 rounded-xl">
+              <BarChart3 className="w-8 h-8 text-violet-600" />
+            </div>
             <span className="font-medium text-gray-700">Relatórios</span>
+            <span className="text-xs text-gray-400">Em breve</span>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm flex flex-col items-center gap-3 opacity-50">
-            <Settings className="w-10 h-10 text-gray-600" />
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
+            <div className="p-3 bg-gray-100 rounded-xl">
+              <Settings className="w-8 h-8 text-gray-600" />
+            </div>
             <span className="font-medium text-gray-700">Configurações</span>
+            <span className="text-xs text-gray-400">Em breve</span>
           </div>
         </div>
 
-        <div className="mt-6 bg-[#00A5AB]/10 border border-[#00A5AB]/30 rounded-xl p-4">
-          <h3 className="font-medium text-[#006669] mb-2">💡 Sincronização</h3>
-          <p className="text-sm text-[#006669]/80">
-            Os dados cadastrados aqui serão sincronizados automaticamente com o ML PDV Desktop.
-          </p>
+        {/* Info card */}
+        <div className="bg-gradient-to-r from-[#006669] to-[#00A5AB] rounded-2xl p-6 text-white">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-white/20 rounded-xl">
+              <RefreshCw className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg mb-1">Sincronização Automática</h3>
+              <p className="text-white/80 text-sm">
+                Os dados cadastrados aqui são sincronizados automaticamente com o ML PDV Desktop. 
+                Alterações feitas em qualquer plataforma serão refletidas em ambos os sistemas.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Footer */}
+        <footer className="mt-8 pt-6 border-t border-gray-200 text-center">
+          <p className="text-sm text-gray-500">
+            <span className="font-semibold text-[#006669]">ML Tech Soluções</span> • Sistema de Gestão Comercial
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            Versão Web 1.0 • © 2026 Todos os direitos reservados
+          </p>
+        </footer>
+      </main>
     </div>
   )
 }
