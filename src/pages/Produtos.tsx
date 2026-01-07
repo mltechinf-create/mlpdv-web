@@ -9,9 +9,19 @@ interface Produto {
   nome: string
   categoria: string | null
   preco_venda: number
+  preco_custo: number
+  margem: number
   estoque: number
+  estoque_minimo: number
   unidade_venda: string
   ean_gtin: string | null
+  ncm: string | null
+  cest: string | null
+  cfop: string | null
+  csosn: number | null
+  fracionado: boolean
+  em_promocao: boolean
+  preco_promocional: number | null
 }
 
 export default function Produtos() {
@@ -28,10 +38,20 @@ export default function Produtos() {
     codigo_interno: '',
     nome: '',
     categoria: '',
+    preco_custo: '',
+    margem: '',
     preco_venda: '',
     estoque: '',
+    estoque_minimo: '',
     unidade_venda: 'UN',
-    ean_gtin: ''
+    fracionado: false,
+    ean_gtin: '',
+    ncm: '',
+    cest: '',
+    cfop: '5102',
+    csosn: '',
+    em_promocao: false,
+    preco_promocional: ''
   })
 
   useEffect(() => {
@@ -63,14 +83,30 @@ export default function Produtos() {
         codigo_interno: produto.codigo_interno || '',
         nome: produto.nome,
         categoria: produto.categoria || '',
+        preco_custo: String(produto.preco_custo || 0),
+        margem: String(produto.margem || 0),
         preco_venda: String(produto.preco_venda),
         estoque: String(produto.estoque),
+        estoque_minimo: String(produto.estoque_minimo || 0),
         unidade_venda: produto.unidade_venda || 'UN',
-        ean_gtin: produto.ean_gtin || ''
+        fracionado: produto.fracionado || false,
+        ean_gtin: produto.ean_gtin || '',
+        ncm: produto.ncm || '',
+        cest: produto.cest || '',
+        cfop: produto.cfop || '5102',
+        csosn: String(produto.csosn || ''),
+        em_promocao: produto.em_promocao || false,
+        preco_promocional: String(produto.preco_promocional || '')
       })
     } else {
       setEditingProduto(null)
-      setForm({ codigo_interno: '', nome: '', categoria: '', preco_venda: '', estoque: '0', unidade_venda: 'UN', ean_gtin: '' })
+      setForm({ 
+        codigo_interno: '', nome: '', categoria: '', 
+        preco_custo: '', margem: '', preco_venda: '', 
+        estoque: '0', estoque_minimo: '0', unidade_venda: 'UN', fracionado: false,
+        ean_gtin: '', ncm: '', cest: '', cfop: '5102', csosn: '',
+        em_promocao: false, preco_promocional: ''
+      })
     }
     setShowModal(true)
   }
@@ -81,36 +117,42 @@ export default function Produtos() {
     setSaving(true)
 
     try {
-      if (editingProduto) {
-        await supabase
-          .from('produtos')
-          .update({
-            codigo_interno: form.codigo_interno || null,
-            nome: form.nome.toUpperCase(),
-            categoria: form.categoria?.toUpperCase() || null,
-            preco_venda: parseFloat(form.preco_venda) || 0,
-            estoque: parseFloat(form.estoque) || 0,
-            unidade_venda: form.unidade_venda,
-            ean_gtin: form.ean_gtin || null,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', editingProduto.id)
-      } else {
-        await supabase
-          .from('produtos')
-          .insert({
-            cnpj,
-            local_id: `web_${Date.now()}`,
-            codigo_interno: form.codigo_interno || null,
-            nome: form.nome.toUpperCase(),
-            categoria: form.categoria?.toUpperCase() || null,
-            preco_venda: parseFloat(form.preco_venda) || 0,
-            estoque: parseFloat(form.estoque) || 0,
-            unidade_venda: form.unidade_venda,
-            ean_gtin: form.ean_gtin || null,
-            origem: 'web'
-          })
-      }
+      const produtoData = {
+          codigo_interno: form.codigo_interno || null,
+          nome: form.nome.toUpperCase(),
+          categoria: form.categoria?.toUpperCase() || null,
+          preco_custo: parseFloat(form.preco_custo) || 0,
+          margem: parseFloat(form.margem) || 0,
+          preco_venda: parseFloat(form.preco_venda) || 0,
+          estoque: parseFloat(form.estoque) || 0,
+          estoque_minimo: parseFloat(form.estoque_minimo) || 0,
+          unidade_venda: form.unidade_venda,
+          fracionado: form.fracionado,
+          ean_gtin: form.ean_gtin || null,
+          ncm: form.ncm || null,
+          cest: form.cest || null,
+          cfop: form.cfop || null,
+          csosn: form.csosn ? parseInt(form.csosn) : null,
+          em_promocao: form.em_promocao,
+          preco_promocional: form.preco_promocional ? parseFloat(form.preco_promocional) : null,
+          updated_at: new Date().toISOString()
+        }
+
+        if (editingProduto) {
+          await supabase
+            .from('produtos')
+            .update(produtoData)
+            .eq('id', editingProduto.id)
+        } else {
+          await supabase
+            .from('produtos')
+            .insert({
+              cnpj,
+              local_id: `web_${Date.now()}`,
+              origem: 'web',
+              ...produtoData
+            })
+        }
 
       setShowModal(false)
       loadProdutos(cnpj)
@@ -224,9 +266,9 @@ export default function Produtos() {
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl w-full max-w-md">
-            <div className="flex items-center justify-between p-4 border-b">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl w-full max-w-2xl my-4">
+            <div className="flex items-center justify-between p-4 border-b sticky top-0 bg-white rounded-t-xl">
               <h2 className="font-semibold text-gray-800">
                 {editingProduto ? 'Editar Produto' : 'Novo Produto'}
               </h2>
@@ -234,58 +276,157 @@ export default function Produtos() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <form onSubmit={handleSave} className="p-4 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
-                  <input type="text" value={form.codigo_interno} onChange={(e) => setForm({ ...form, codigo_interno: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
+            <form onSubmit={handleSave} className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+              
+              {/* Dados básicos */}
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">Dados Básicos</h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Código Interno</label>
+                    <input type="text" value={form.codigo_interno} onChange={(e) => setForm({ ...form, codigo_interno: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">EAN/GTIN</label>
+                    <input type="text" value={form.ean_gtin} onChange={(e) => setForm({ ...form, ean_gtin: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Unidade</label>
+                    <select value={form.unidade_venda} onChange={(e) => setForm({ ...form, unidade_venda: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none">
+                      <option value="UN">UN</option>
+                      <option value="KG">KG</option>
+                      <option value="L">L</option>
+                      <option value="M">M</option>
+                      <option value="CX">CX</option>
+                      <option value="PC">PC</option>
+                    </select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
-                  <select value={form.unidade_venda} onChange={(e) => setForm({ ...form, unidade_venda: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none">
-                    <option value="UN">UN</option>
-                    <option value="KG">KG</option>
-                    <option value="L">L</option>
-                    <option value="M">M</option>
-                    <option value="CX">CX</option>
-                  </select>
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Nome do Produto *</label>
+                  <input type="text" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" required />
+                </div>
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Categoria</label>
+                    <input type="text" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div className="flex items-end gap-4">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="checkbox" checked={form.fracionado} onChange={(e) => setForm({ ...form, fracionado: e.target.checked })}
+                        className="rounded border-gray-300" />
+                      Fracionado
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
-                <input type="text" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" required />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                <input type="text" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Preço Venda *</label>
-                  <input type="number" step="0.01" value={form.preco_venda} onChange={(e) => setForm({ ...form, preco_venda: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" required />
+              {/* Preços */}
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">Preços</h3>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Preço Custo</label>
+                    <input type="number" step="0.01" value={form.preco_custo} onChange={(e) => setForm({ ...form, preco_custo: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Margem %</label>
+                    <input type="number" step="0.01" value={form.margem} onChange={(e) => setForm({ ...form, margem: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Preço Venda *</label>
+                    <input type="number" step="0.01" value={form.preco_venda} onChange={(e) => setForm({ ...form, preco_venda: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none font-medium" required />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Estoque</label>
-                  <input type="number" step="0.001" value={form.estoque} onChange={(e) => setForm({ ...form, estoque: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
+                <div className="grid grid-cols-3 gap-3 mt-3">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" checked={form.em_promocao} onChange={(e) => setForm({ ...form, em_promocao: e.target.checked })}
+                      className="rounded border-gray-300" />
+                    <label className="text-xs font-medium text-gray-600">Em Promoção</label>
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Preço Promocional</label>
+                    <input type="number" step="0.01" value={form.preco_promocional} onChange={(e) => setForm({ ...form, preco_promocional: e.target.value })}
+                      disabled={!form.em_promocao}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none disabled:bg-gray-100 disabled:opacity-50" />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-4">
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              {/* Estoque */}
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">Estoque</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Estoque Atual</label>
+                    <input type="number" step="0.001" value={form.estoque} onChange={(e) => setForm({ ...form, estoque: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Estoque Mínimo</label>
+                    <input type="number" step="0.001" value={form.estoque_minimo} onChange={(e) => setForm({ ...form, estoque_minimo: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Fiscal */}
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">Dados Fiscais</h3>
+                <div className="grid grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">NCM</label>
+                    <input type="text" value={form.ncm} onChange={(e) => setForm({ ...form, ncm: e.target.value })}
+                      maxLength={8} placeholder="00000000"
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">CEST</label>
+                    <input type="text" value={form.cest} onChange={(e) => setForm({ ...form, cest: e.target.value })}
+                      maxLength={7} placeholder="0000000"
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">CFOP</label>
+                    <select value={form.cfop} onChange={(e) => setForm({ ...form, cfop: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none">
+                      <option value="5102">5102</option>
+                      <option value="5101">5101</option>
+                      <option value="5405">5405</option>
+                      <option value="5403">5403</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">CSOSN</label>
+                    <select value={form.csosn} onChange={(e) => setForm({ ...form, csosn: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-[#00A5AB] outline-none">
+                      <option value="">Selecione</option>
+                      <option value="102">102 - Tributação SN</option>
+                      <option value="103">103 - Isento ICMS</option>
+                      <option value="300">300 - Imune</option>
+                      <option value="400">400 - Não tributada</option>
+                      <option value="500">500 - ICMS ST</option>
+                      <option value="900">900 - Outros</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2 sticky bottom-0 bg-white pb-2">
+                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
                   Cancelar
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-[#006669] hover:bg-[#004d4f] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50">
-                  {saving ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Save className="w-4 h-4" />Salvar</>}
+                  className="flex-1 bg-[#006669] hover:bg-[#004d4f] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 text-sm">
+                  {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Save className="w-4 h-4" />Salvar</>}
                 </button>
               </div>
             </form>

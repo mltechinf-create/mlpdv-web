@@ -141,14 +141,14 @@ export default function Dashboard() {
         )}
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-4">
         {/* Boas-vindas */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              Olá, {session.nome.split(' ')[0]}! 👋
+            <h2 className="text-xl font-bold text-gray-800">
+              Olá, {session.nome.split(' ')[0]}!
             </h2>
-            <p className="text-gray-500">Aqui está o resumo do seu negócio</p>
+            <p className="text-sm text-gray-500">Resumo do seu negócio</p>
           </div>
           <button 
             onClick={() => loadData(cnpjParam?.replace(/\D/g, '') || session.cnpj)}
@@ -156,115 +156,97 @@ export default function Dashboard() {
             className="p-2 hover:bg-gray-100 rounded-lg text-gray-600 transition"
             title="Atualizar"
           >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
 
         {/* Cards de estatísticas */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           <Link 
             to={`/${cnpjParam}/produtos`} 
-            className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100"
+            className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
           >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-gray-800">{stats.produtos}</p>
-                <p className="text-gray-500 mt-1">Produtos</p>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-[#006669] to-[#00A5AB] rounded-lg">
+                <Package className="w-5 h-5 text-white" />
               </div>
-              <div className="p-4 bg-gradient-to-br from-[#006669] to-[#00A5AB] rounded-xl">
-                <Package className="w-6 h-6 text-white" />
+              <div>
+                <p className="text-2xl font-bold text-gray-800">{stats.produtos}</p>
+                <p className="text-xs text-gray-500">Produtos</p>
               </div>
             </div>
           </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-gray-800">{stats.clientes}</p>
-                <p className="text-gray-500 mt-1">Clientes</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg">
+                <Users className="w-5 h-5 text-white" />
               </div>
-              <div className="p-4 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl">
-                <Users className="w-6 h-6 text-white" />
+              <div>
+                <p className="text-2xl font-bold text-gray-800">{stats.clientes}</p>
+                <p className="text-xs text-gray-500">Clientes</p>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Em breve</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 opacity-60">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-3xl font-bold text-gray-800">{stats.vendas}</p>
-                <p className="text-gray-500 mt-1">Vendas</p>
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg">
+                <ShoppingCart className="w-5 h-5 text-white" />
               </div>
-              <div className="p-4 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl">
-                <ShoppingCart className="w-6 h-6 text-white" />
+              <div>
+                <p className="text-2xl font-bold text-gray-800">{stats.vendas}</p>
+                <p className="text-xs text-gray-500">Vendas</p>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-3">Em breve</p>
           </div>
         </div>
 
         {/* Menu de navegação */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Acesso Rápido</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <h3 className="text-sm font-semibold text-gray-600 mb-3">Acesso Rápido</h3>
+        <div className="grid grid-cols-4 gap-3 mb-6">
           <Link 
             to={`/${cnpjParam}/produtos`} 
-            className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100 flex flex-col items-center gap-3"
+            className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-2"
           >
-            <div className="p-3 bg-[#006669]/10 rounded-xl">
-              <Package className="w-8 h-8 text-[#006669]" />
+            <div className="p-2 bg-[#006669]/10 rounded-lg">
+              <Package className="w-6 h-6 text-[#006669]" />
             </div>
-            <span className="font-medium text-gray-700">Produtos</span>
+            <span className="text-sm font-medium text-gray-700">Produtos</span>
           </Link>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
-            <div className="p-3 bg-emerald-50 rounded-xl">
-              <Users className="w-8 h-8 text-emerald-600" />
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
+            <div className="p-2 bg-emerald-50 rounded-lg">
+              <Users className="w-6 h-6 text-emerald-600" />
             </div>
-            <span className="font-medium text-gray-700">Clientes</span>
-            <span className="text-xs text-gray-400">Em breve</span>
+            <span className="text-sm font-medium text-gray-700">Clientes</span>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
-            <div className="p-3 bg-violet-50 rounded-xl">
-              <BarChart3 className="w-8 h-8 text-violet-600" />
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
+            <div className="p-2 bg-violet-50 rounded-lg">
+              <BarChart3 className="w-6 h-6 text-violet-600" />
             </div>
-            <span className="font-medium text-gray-700">Relatórios</span>
-            <span className="text-xs text-gray-400">Em breve</span>
+            <span className="text-sm font-medium text-gray-700">Relatórios</span>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 flex flex-col items-center gap-3 opacity-50 cursor-not-allowed">
-            <div className="p-3 bg-gray-100 rounded-xl">
-              <Settings className="w-8 h-8 text-gray-600" />
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <Settings className="w-6 h-6 text-gray-600" />
             </div>
-            <span className="font-medium text-gray-700">Configurações</span>
-            <span className="text-xs text-gray-400">Em breve</span>
+            <span className="text-sm font-medium text-gray-700">Config</span>
           </div>
         </div>
 
-        {/* Info card */}
-        <div className="bg-gradient-to-r from-[#006669] to-[#00A5AB] rounded-2xl p-6 text-white">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-white/20 rounded-xl">
-              <RefreshCw className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-lg mb-1">Sincronização Automática</h3>
-              <p className="text-white/80 text-sm">
-                Os dados cadastrados aqui são sincronizados automaticamente com o ML PDV Desktop. 
-                Alterações feitas em qualquer plataforma serão refletidas em ambos os sistemas.
-              </p>
-            </div>
-          </div>
+        {/* Info discreta */}
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-4">
+          <RefreshCw className="w-3 h-3" />
+          <span>Sincronizado com ML PDV Desktop</span>
         </div>
 
         {/* Footer */}
-        <footer className="mt-8 pt-6 border-t border-gray-200 text-center">
-          <p className="text-sm text-gray-500">
-            <span className="font-semibold text-[#006669]">ML Tech Soluções</span> • Sistema de Gestão Comercial
-          </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Versão Web 1.0 • © 2026 Todos os direitos reservados
+        <footer className="mt-4 pt-4 border-t border-gray-200 text-center">
+          <p className="text-xs text-gray-400">
+            <span className="font-medium text-[#006669]">ML Tech Soluções</span> • © 2026
           </p>
         </footer>
       </main>
