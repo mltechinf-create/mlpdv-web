@@ -65,13 +65,17 @@ export default function Produtos() {
 
   const loadProdutos = async (cnpj: string) => {
     setLoading(true)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('produtos')
       .select('*')
       .eq('cnpj', cnpj)
-      .eq('ativo', true)
+      .or('ativo.eq.true,ativo.is.null')
       .order('nome')
 
+    if (error) {
+      console.error('Erro ao carregar produtos:', error)
+    }
+    console.log('Produtos carregados:', data?.length || 0)
     setProdutos(data || [])
     setLoading(false)
   }
