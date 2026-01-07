@@ -216,7 +216,10 @@ export default function Dashboard() {
             </div>
           </Link>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-50">
+          <Link 
+            to={`/${cnpjParam}/clientes`} 
+            className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100"
+          >
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg">
                 <Users className="w-5 h-5 text-white" />
@@ -226,7 +229,7 @@ export default function Dashboard() {
                 <p className="text-xs text-gray-500">Clientes</p>
               </div>
             </div>
-          </div>
+          </Link>
 
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 opacity-50">
             <div className="flex items-center gap-3">
@@ -254,12 +257,15 @@ export default function Dashboard() {
             <span className="text-sm font-medium text-gray-700">Produtos</span>
           </Link>
 
-          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
+          <Link 
+            to={`/${cnpjParam}/clientes`} 
+            className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-100 flex flex-col items-center gap-2"
+          >
             <div className="p-2 bg-emerald-50 rounded-lg">
               <Users className="w-6 h-6 text-emerald-600" />
             </div>
             <span className="text-sm font-medium text-gray-700">Clientes</span>
-          </div>
+          </Link>
 
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col items-center gap-2 opacity-40 cursor-not-allowed">
             <div className="p-2 bg-violet-50 rounded-lg">
