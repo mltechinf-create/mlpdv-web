@@ -93,8 +93,8 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <Link to={`/${cnpjParam}/produtos`} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Package className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-[#00A5AB]/20 rounded-lg">
+                <Package className="w-6 h-6 text-[#006669]" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-800">{stats.produtos}</p>
@@ -130,7 +130,7 @@ export default function Dashboard() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Link to={`/${cnpjParam}/produtos`} className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col items-center gap-3">
-            <Package className="w-10 h-10 text-blue-600" />
+            <Package className="w-10 h-10 text-[#006669]" />
             <span className="font-medium text-gray-700">Produtos</span>
           </Link>
 
@@ -150,9 +150,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <h3 className="font-medium text-blue-800 mb-2">💡 Sincronização</h3>
-          <p className="text-sm text-blue-700">
+        <div className="mt-6 bg-[#00A5AB]/10 border border-[#00A5AB]/30 rounded-xl p-4">
+          <h3 className="font-medium text-[#006669] mb-2">💡 Sincronização</h3>
+          <p className="text-sm text-[#006669]/80">
             Os dados cadastrados aqui serão sincronizados automaticamente com o ML PDV Desktop.
           </p>
         </div>

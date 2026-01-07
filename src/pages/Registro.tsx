@@ -93,10 +93,10 @@ export default function Registro() {
 
   if (step === 3) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-600 to-green-800 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-[#006669] to-[#00A5AB] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <Check className="w-8 h-8 text-green-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[#00A5AB]/20 rounded-full mb-4">
+            <Check className="w-8 h-8 text-[#006669]" />
           </div>
           <h1 className="text-2xl font-bold text-gray-800 mb-2">Cadastro Realizado!</h1>
           <p className="text-gray-500 mb-6">
@@ -104,7 +104,7 @@ export default function Registro() {
           </p>
           <button
             onClick={() => navigate(`/${empresa.cnpj.replace(/\D/g, '')}`)}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition"
+            className="w-full bg-[#006669] hover:bg-[#004d4f] text-white font-semibold py-3 rounded-lg transition"
           >
             Ir para Login
           </button>
@@ -114,7 +114,7 @@ export default function Registro() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#006669] to-[#00A5AB] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8">
         <button
           onClick={() => step === 1 ? navigate('/') : setStep(1)}
@@ -130,8 +130,8 @@ export default function Registro() {
             {step === 1 ? 'Dados da empresa' : 'Dados do administrador'}
           </p>
           <div className="flex justify-center gap-2 mt-4">
-            <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-blue-600' : 'bg-gray-300'}`} />
-            <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 1 ? 'bg-[#006669]' : 'bg-gray-300'}`} />
+            <div className={`w-3 h-3 rounded-full ${step >= 2 ? 'bg-[#006669]' : 'bg-gray-300'}`} />
           </div>
         </div>
 
@@ -147,7 +147,7 @@ export default function Registro() {
                     value={empresa.cnpj}
                     onChange={(e) => setEmpresa({ ...empresa, cnpj: formatCNPJ(e.target.value) })}
                     placeholder="00.000.000/0000-00"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     required
                   />
                 </div>
@@ -160,7 +160,7 @@ export default function Registro() {
                   value={empresa.razao_social}
                   onChange={(e) => setEmpresa({ ...empresa, razao_social: e.target.value })}
                   placeholder="Nome da empresa"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                   required
                 />
               </div>
@@ -172,7 +172,7 @@ export default function Registro() {
                   value={empresa.nome_fantasia}
                   onChange={(e) => setEmpresa({ ...empresa, nome_fantasia: e.target.value })}
                   placeholder="Nome comercial"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                 />
               </div>
 
@@ -186,7 +186,7 @@ export default function Registro() {
                       value={empresa.cidade}
                       onChange={(e) => setEmpresa({ ...empresa, cidade: e.target.value })}
                       placeholder="Cidade"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     />
                   </div>
                 </div>
@@ -198,7 +198,7 @@ export default function Registro() {
                     onChange={(e) => setEmpresa({ ...empresa, uf: e.target.value.toUpperCase().slice(0, 2) })}
                     placeholder="RS"
                     maxLength={2}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                   />
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function Registro() {
                       value={empresa.telefone}
                       onChange={(e) => setEmpresa({ ...empresa, telefone: e.target.value })}
                       placeholder="(00) 00000-0000"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     />
                   </div>
                 </div>
@@ -226,7 +226,7 @@ export default function Registro() {
                       value={empresa.email}
                       onChange={(e) => setEmpresa({ ...empresa, email: e.target.value })}
                       placeholder="email@empresa.com"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     />
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export default function Registro() {
                     value={usuario.nome}
                     onChange={(e) => setUsuario({ ...usuario, nome: e.target.value })}
                     placeholder="Seu nome"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     required
                   />
                 </div>
@@ -258,7 +258,7 @@ export default function Registro() {
                   value={usuario.cpf}
                   onChange={(e) => setUsuario({ ...usuario, cpf: formatCPF(e.target.value) })}
                   placeholder="000.000.000-00"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                   required
                 />
               </div>
@@ -272,7 +272,7 @@ export default function Registro() {
                     value={usuario.senha}
                     onChange={(e) => setUsuario({ ...usuario, senha: e.target.value })}
                     placeholder="Crie uma senha"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     required
                     minLength={6}
                   />
@@ -288,7 +288,7 @@ export default function Registro() {
                     value={usuario.confirmarSenha}
                     onChange={(e) => setUsuario({ ...usuario, confirmarSenha: e.target.value })}
                     placeholder="Repita a senha"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
                     required
                   />
                 </div>
@@ -305,7 +305,7 @@ export default function Registro() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50"
+            className="w-full mt-6 bg-[#006669] hover:bg-[#004d4f] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

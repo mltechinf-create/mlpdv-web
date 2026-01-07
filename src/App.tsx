@@ -13,11 +13,11 @@ function App() {
         <Route path="/:cnpj/dashboard" element={<Dashboard />} />
         <Route path="/:cnpj/produtos" element={<Produtos />} />
         <Route path="/" element={
-          <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800 p-4">
+          <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#006669] to-[#00A5AB] p-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center">
               <h1 className="text-2xl font-bold text-gray-800 mb-4">ML PDV Web</h1>
               <p className="text-gray-500 mb-6">Painel administrativo para gerenciar sua empresa</p>
-              <a href="/registro" className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition mb-3">
+              <a href="/registro" className="block w-full bg-[#006669] hover:bg-[#004d4f] text-white font-semibold py-3 rounded-lg transition mb-3">
                 Cadastrar Empresa
               </a>
               <p className="text-sm text-gray-400">Já tem cadastro? Acesse via /SEU_CNPJ</p>

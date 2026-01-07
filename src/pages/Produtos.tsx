@@ -144,7 +144,7 @@ export default function Produtos() {
           </div>
           <button
             onClick={() => openModal()}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
+            className="bg-[#006669] hover:bg-[#004d4f] text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             Novo
@@ -160,7 +160,7 @@ export default function Produtos() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar produto..."
-            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+            className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none"
           />
         </div>
 
@@ -170,7 +170,7 @@ export default function Produtos() {
           <div className="text-center py-12">
             <Package className="w-12 h-12 mx-auto text-gray-300 mb-4" />
             <p className="text-gray-500">Nenhum produto cadastrado</p>
-            <button onClick={() => openModal()} className="mt-4 text-blue-600 hover:underline">
+            <button onClick={() => openModal()} className="mt-4 text-[#006669] hover:underline">
               Cadastrar primeiro produto
             </button>
           </div>
@@ -201,7 +201,7 @@ export default function Produtos() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => openModal(produto)} className="p-2 hover:bg-blue-100 rounded-lg text-blue-600" title="Editar">
+                        <button onClick={() => openModal(produto)} className="p-2 hover:bg-[#00A5AB]/20 rounded-lg text-[#006669]" title="Editar">
                           <Edit className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleDelete(produto)} className="p-2 hover:bg-red-100 rounded-lg text-red-600" title="Excluir">
@@ -233,12 +233,12 @@ export default function Produtos() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Código</label>
                   <input type="text" value={form.codigo} onChange={(e) => setForm({ ...form, codigo: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
                   <select value={form.unidade} onChange={(e) => setForm({ ...form, unidade: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none">
                     <option value="UN">UN</option>
                     <option value="KG">KG</option>
                     <option value="L">L</option>
@@ -251,25 +251,25 @@ export default function Produtos() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome *</label>
                 <input type="text" value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" required />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
                 <input type="text" value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Preço Venda *</label>
                   <input type="number" step="0.01" value={form.preco_venda} onChange={(e) => setForm({ ...form, preco_venda: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required />
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" required />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Estoque</label>
                   <input type="number" step="0.001" value={form.estoque_atual} onChange={(e) => setForm({ ...form, estoque_atual: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A5AB] outline-none" />
                 </div>
               </div>
 
@@ -278,7 +278,7 @@ export default function Produtos() {
                   Cancelar
                 </button>
                 <button type="submit" disabled={saving}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50">
+                  className="flex-1 bg-[#006669] hover:bg-[#004d4f] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50">
                   {saving ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <><Save className="w-4 h-4" />Salvar</>}
                 </button>
               </div>
